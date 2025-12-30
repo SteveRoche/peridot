@@ -1,0 +1,24 @@
+[package]
+name = "src-wasm"
+version = "0.1.0"
+edition = "2024"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+chrono = "0.4.42"
+console_error_panic_hook = "0.1.7"
+futures = "0.3.31"
+js-sys = "0.3.83"
+parking_lot = "0.12.5"
+regex = "1.12.2"
+tokio = { version = "1.48.0", features = ["rt"] }
+typst = "0.14.0"
+typst-assets = { version = "0.14.0", features = ["fonts"] }
+typst-render = "0.14.0"
+wasm-bindgen = "0.2.105"
+wasm-bindgen-futures = "0.4.56"
+
+[package.metadata.wasm-pack.profile.dev]
+wasm-opt = false # For faster wasm-pack build --dev
