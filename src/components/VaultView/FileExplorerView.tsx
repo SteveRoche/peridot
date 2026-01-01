@@ -7,7 +7,7 @@ import {
 } from '../ui/accordion';
 import { Button, buttonVariants } from '../ui/button';
 import { VaultTreeNode } from '@/types';
-import { TYPST_EXTENSION } from '@/globals';
+import { VAULT_DATA_DIR, TYPST_EXTENSION } from '@/globals';
 
 type FileExplorerViewProps = {
   fileTree: VaultTreeNode[];
@@ -34,7 +34,7 @@ export default function FileExplorerView({
   return (
     <aside>
       {fileTree
-        .filter(entry => entry.name !== '.peridot')
+        .filter(entry => entry.name !== VAULT_DATA_DIR)
         .map(entry =>
           entry.children ? (
             entry.children.length > 0 ? (

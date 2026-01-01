@@ -12,6 +12,7 @@ import { create, readDir, open, writeTextFile } from '@tauri-apps/plugin-fs';
 import { join } from '@tauri-apps/api/path';
 import { TYPST_EXTENSION } from '@/globals';
 import { vim } from '@replit/codemirror-vim';
+import { useVaultSettingsStore } from '@/stores/vaultSettingsStore';
 
 interface VaultViewProps {
   vaultDir: string;
@@ -39,21 +40,21 @@ const loadVaultDirEntries = async (
 };
 
 const scanAndFindFile = (
-    dirPath: string,
-    dir: VaultTreeNode[],
-    basename: string,
+  dirPath: string,
+  dir: VaultTreeNode[],
+  basename: string,
 ): string | null => {
-    for (const entry of dir) {
-      if (entry.isDirectory && entry.children) {
-        const innerDirPath =
-          basename === '' ? entry.name : `${dirPath}/${entry.name}`;
-        const scan = scanAndFindFile(innerDirPath, entry.children, basename);
-        if (scan !== null) return scan;
-      } else if (entry.name === basename) {
-        return `${dirPath}/${basename}`;
-      }
+  for (const entry of dir) {
+    if (entry.isDirectory && entry.children) {
+      const innerDirPath =
+        basename === '' ? entry.name : `${dirPath}/${entry.name}`;
+      const scan = scanAndFindFile(innerDirPath, entry.children, basename);
+      if (scan !== null) return scan;
+    } else if (entry.name === basename) {
+      return `${dirPath}/${basename}`;
     }
-    return null;
+  }
+  return null;
 };
 
 export default function VaultView(props: VaultViewProps) {
@@ -65,7 +66,10 @@ export default function VaultView(props: VaultViewProps) {
   const typstCanvasRef = useRef<TypstCanvasHandle | null>(null);
   const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
+  const vaultSettings = useVaultSettingsStore();
+
   useEffect(() => {
+    vaultSettings.hydrate(vaultDir);
     loadVaultDirEntries(vaultDir).then(setFileTree);
   }, [vaultDir]);
 
@@ -103,9 +107,7 @@ export default function VaultView(props: VaultViewProps) {
     let relativeFilePath = scanAndFindFile('', fileTree, noteBasename);
     if (!relativeFilePath) {
       relativeFilePath = `Inbox/${noteBasename}`;
-      await create(
-        await join(vaultDir, relativeFilePath),
-      );
+      await create(await join(vaultDir, relativeFilePath));
       loadVaultDirEntries(vaultDir).then(setFileTree);
     }
 
@@ -152,7 +154,7 @@ export default function VaultView(props: VaultViewProps) {
             <CodeMirror
               value={source}
               height="100vh"
-              extensions={[vim()]}
+              extensions={vaultSettings.enableVim ? [vim()] : []}
               onChange={onSourceChange}
             />
           )}

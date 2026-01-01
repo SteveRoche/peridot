@@ -7,7 +7,7 @@ import {
 } from 'react';
 import { Mutex } from 'async-mutex';
 import { TypstWorkerClient } from '@/TypstWorkerClient';
-import { DATA_DIR } from '@/globals';
+import { VAULT_PACKAGES_DIR } from '@/globals';
 import {
   exists,
   mkdir,
@@ -190,7 +190,7 @@ async function fetchPackage(spec: string, vaultDir: string): Promise<Package> {
   if (response.status === 404) {
     throw 2;
   }
-  const packageDir = `${vaultDir}/${DATA_DIR}/${spec}`;
+  const packageDir = `${vaultDir}/${VAULT_PACKAGES_DIR}/${spec}`;
   if (await exists(packageDir)) {
     const packageFiles = await collectPackageFiles(packageDir);
     return {
@@ -209,11 +209,11 @@ async function fetchPackage(spec: string, vaultDir: string): Promise<Package> {
     await Promise.all(
       files.map(async file => {
         if (file.type === '5' && file.name !== '.') {
-          await mkdir(`${vaultDir}/${DATA_DIR}/${spec}/${file.name}`);
+          await mkdir(`${vaultDir}/${VAULT_PACKAGES_DIR}/${spec}/${file.name}`);
         }
         if (file.type === '0') {
           await writeFile(
-            `${vaultDir}/${DATA_DIR}/${spec}/${file.name}`,
+            `${vaultDir}/${VAULT_PACKAGES_DIR}/${spec}/${file.name}`,
             new Uint8Array(file.buffer),
           );
           packageFiles.push({
