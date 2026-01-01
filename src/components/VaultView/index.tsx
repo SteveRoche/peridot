@@ -106,7 +106,7 @@ export default function VaultView(props: VaultViewProps) {
     const noteBasename = `${url.slice('peridot://'.length, url.length)}.typ`;
     let relativeFilePath = scanAndFindFile('', fileTree, noteBasename);
     if (!relativeFilePath) {
-      relativeFilePath = `Inbox/${noteBasename}`;
+      relativeFilePath = noteBasename;
       await create(await join(vaultDir, relativeFilePath));
       loadVaultDirEntries(vaultDir).then(setFileTree);
     }
