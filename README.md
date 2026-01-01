@@ -1,5 +1,7 @@
 # Peridot
 
+> ⚠️ Peridot is currently heavily work-in-progress and is not yet intended for daily use. Although I've personally started to use it daily, it is very rough-around-the-edges and many features are missing. You can expect the app to be in better shape when I get the first release out on the [Releases](https://github.com/SteveRoche/peridot/releases/) page. Watch this space!
+
 A Typst-based notetaking app with linking between notes.
 
 There is no CI set up yet, so you will have to build Peridot from source.
