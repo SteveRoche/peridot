@@ -1,7 +1,6 @@
 import init, { render, load_package } from '../src-wasm/pkg/src_wasm';
-import { PlainLinkDesc } from './components/TypstCanvas';
+import { PlainLinkDesc } from './components/VaultView/TypstCanvas';
 import { TypstWorkerMessage } from './TypstWorkerClient';
-// import untar from 'untar-sync';
 
 let ready = false;
 

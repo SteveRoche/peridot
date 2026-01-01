@@ -1,4 +1,4 @@
-import { Package } from './components/TypstCanvas';
+import { Package } from './components/VaultView/TypstCanvas';
 
 export class TypstWorkerClient {
   private worker: Worker;

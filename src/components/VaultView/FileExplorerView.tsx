@@ -4,8 +4,8 @@ import {
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from './ui/accordion';
-import { Button, buttonVariants } from './ui/button';
+} from '../ui/accordion';
+import { Button, buttonVariants } from '../ui/button';
 import { VaultTreeNode } from '@/types';
 import { TYPST_EXTENSION } from '@/globals';
 
