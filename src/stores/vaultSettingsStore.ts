@@ -9,25 +9,27 @@ import { create } from 'zustand';
 
 interface VaultSettings {
   enableVim: boolean;
+  preamble: string;
 }
 
 export interface VaultSettingsStore extends VaultSettings {
   _hydrated: boolean;
   hydrate: (vaultDir: string) => Promise<void>;
   save: (vaultDir: string) => Promise<void>;
-  setEnableVim: (value: boolean) => void;
+  updateSettings: (settings: Partial<VaultSettings>) => void;
 }
 
 const initVaultSettings: VaultSettings = {
   enableVim: false,
+  preamble: '',
 };
 
 export const useVaultSettingsStore = create<VaultSettingsStore>()(
   (set, get) => ({
     _hydrated: false,
-    enableVim: false,
+    ...initVaultSettings,
 
-    hydrate: async (vaultDir: string) => {
+    async hydrate(vaultDir: string) {
       const vaultDataDir = `${vaultDir}/${VAULT_DATA_DIR}`;
       if (!(await exists(vaultDataDir))) {
         await mkdir(vaultDataDir);
@@ -42,7 +44,7 @@ export const useVaultSettingsStore = create<VaultSettingsStore>()(
       set({ ...vaultConfig, _hydrated: true });
     },
 
-    save: async (vaultDir: string) => {
+    async save(vaultDir: string) {
       const { _hydrated, ...toSave } = get();
       await writeTextFile(
         `${vaultDir}/${VAULT_DATA_DIR}/${VAULT_CONFIG_FILE}`,
@@ -50,8 +52,11 @@ export const useVaultSettingsStore = create<VaultSettingsStore>()(
       );
     },
 
-    setEnableVim: (value: boolean) => {
-      set({ enableVim: value });
+    updateSettings(update) {
+      set(state => ({
+        ...state,
+        ...update,
+      }));
     },
   }),
 );

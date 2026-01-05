@@ -18,15 +18,7 @@ import {
 import untar from 'js-untar';
 import { decompressSync } from 'fflate';
 import { useRootConfigStore } from '@/stores/rootConfigStore';
-
-const PREAMBLE =
-  '#set page(margin: .5cm, height: auto)\n' +
-  '#set text(size: 19pt)\n' +
-  '#show link: it => underline(text(fill: blue)[#it])\n' +
-  '#set math.mat(delim: "[")\n' +
-  '#let it = math.italic\n' +
-  '#let vec(expr) = math.bold(math.upright(expr))\n' +
-  '#let wedge = $and$\n';
+import { useVaultSettingsStore } from '@/stores/vaultSettingsStore';
 
 export type PlainLinkDesc = {
   x: number;
@@ -74,6 +66,7 @@ const TypstCanvas: React.FC<TypstCanvasProps> = ({
   const workerRef = useRef<TypstWorkerClient>(null);
   const [docLinks, setDocLinks] = useState<PlainLinkDesc[]>([]);
   const rootConfig = useRootConfigStore();
+  const preamble = useVaultSettingsStore(state => state.preamble);
 
   const mutexRef = useRef<Mutex>(new Mutex());
 
@@ -116,7 +109,7 @@ const TypstCanvas: React.FC<TypstCanvasProps> = ({
         const { width, height, data, links } =
           await workerRef.current.executeTask<RenderResult>({
             type: 'RENDER',
-            source: `${PREAMBLE}${newSource}`,
+            source: `${preamble}\n${newSource}`,
             filePath,
             dpi,
           });

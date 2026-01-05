@@ -3,7 +3,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../ui/dialog';
 import { Label } from '../ui/label';
 import { Switch } from '../ui/switch';
 import { useVaultSettingsStore } from '@/stores/vaultSettingsStore';
-import { useEffect, useState } from 'react';
+import { ChangeEventHandler, useEffect, useState } from 'react';
+import { Textarea } from '../ui/textarea';
 
 export interface VaultSettingsDialogProps {
   vaultDir: string;
@@ -27,7 +28,12 @@ export default function VaultSettingsDialog(props: VaultSettingsDialogProps) {
   }, [vaultDir]);
 
   const toggleVim = (checked: boolean) => {
-    vaultSettings.setEnableVim(checked);
+    vaultSettings.updateSettings({ enableVim: checked });
+    vaultSettings.save(vaultDir);
+  };
+
+  const savePreamble: ChangeEventHandler<HTMLTextAreaElement> = e => {
+    vaultSettings.updateSettings({ preamble: e.target.value });
     vaultSettings.save(vaultDir);
   };
 
@@ -38,6 +44,7 @@ export default function VaultSettingsDialog(props: VaultSettingsDialogProps) {
           <DialogTitle>Settings</DialogTitle>
           <DialogDescription></DialogDescription>
         </DialogHeader>
+        {/* <div className="flex flex-col"></div> */}
         <div className="flex items-center space-x-2">
           <Switch
             checked={vaultSettings.enableVim}
@@ -46,6 +53,12 @@ export default function VaultSettingsDialog(props: VaultSettingsDialogProps) {
           />
           <Label htmlFor="enable-vim">Enable vim keybindings</Label>
         </div>
+        <Textarea
+          rows={7}
+          value={vaultSettings.preamble}
+          onChange={savePreamble}
+          placeholder="Preamble"
+        />
       </DialogContent>
     </Dialog>
   );
