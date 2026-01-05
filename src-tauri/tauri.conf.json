@@ -14,7 +14,8 @@
       {
         "title": "Peridot",
         "width": 1280,
-        "height": 768
+        "height": 768,
+        "maximized": true
       }
     ],
     "security": {
