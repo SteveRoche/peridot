@@ -2,8 +2,11 @@ import { DialogDescription } from '@radix-ui/react-dialog';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../ui/dialog';
 import { Label } from '../ui/label';
 import { Switch } from '../ui/switch';
-import { useVaultSettingsStore } from '@/stores/vaultSettingsStore';
-import { ChangeEventHandler, useEffect, useState } from 'react';
+import {
+  useVaultSettingsStore,
+  VaultSettings,
+} from '@/stores/vaultSettingsStore';
+import { useEffect, useState } from 'react';
 import { Textarea } from '../ui/textarea';
 import { Input } from '../ui/input';
 
@@ -28,18 +31,12 @@ export default function VaultSettingsDialog(props: VaultSettingsDialogProps) {
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [vaultDir]);
 
-  const toggleVim = (checked: boolean) => {
-    vaultSettings.updateSettings({ enableVim: checked });
-    vaultSettings.save(vaultDir);
-  };
-
-  const saveNewNoteDirectory: ChangeEventHandler<HTMLInputElement> = e => {
-    vaultSettings.updateSettings({ newNoteDirectory: e.target.value });
-    vaultSettings.save(vaultDir);
-  };
-
-  const savePreamble: ChangeEventHandler<HTMLTextAreaElement> = e => {
-    vaultSettings.updateSettings({ preamble: e.target.value });
+  const handleSettingsUpdate = <K extends keyof VaultSettings>(
+    key: K,
+    value: VaultSettings[K],
+  ) => {
+    vaultSettings.updateSettings({ [key]: value });
+    // TODO(perf): Debounce and/or collect changes into one update and save
     vaultSettings.save(vaultDir);
   };
 
@@ -57,21 +54,25 @@ export default function VaultSettingsDialog(props: VaultSettingsDialogProps) {
           <Input
             id="new-note-directory"
             value={vaultSettings.newNoteDirectory}
-            onChange={saveNewNoteDirectory}
+            onChange={e =>
+              handleSettingsUpdate('newNoteDirectory', e.target.value)
+            }
           />
         </div>
         <div className="flex items-center space-x-2">
           <Switch
             id="enable-vim"
             checked={vaultSettings.enableVim}
-            onCheckedChange={toggleVim}
+            onCheckedChange={checked =>
+              handleSettingsUpdate('enableVim', checked)
+            }
           />
           <Label htmlFor="enable-vim">Enable vim keybindings</Label>
         </div>
         <Textarea
           rows={7}
           value={vaultSettings.preamble}
-          onChange={savePreamble}
+          onChange={e => handleSettingsUpdate('preamble', e.target.value)}
           placeholder="Preamble"
         />
       </DialogContent>

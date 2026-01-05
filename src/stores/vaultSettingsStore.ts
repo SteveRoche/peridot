@@ -7,7 +7,7 @@ import {
 } from '@tauri-apps/plugin-fs';
 import { create } from 'zustand';
 
-interface VaultSettings {
+export interface VaultSettings {
   enableVim: boolean;
   preamble: string;
   newNoteDirectory: string;
