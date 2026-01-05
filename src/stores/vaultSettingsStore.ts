@@ -10,6 +10,7 @@ import { create } from 'zustand';
 interface VaultSettings {
   enableVim: boolean;
   preamble: string;
+  newNoteDirectory: string;
 }
 
 export interface VaultSettingsStore extends VaultSettings {
@@ -22,6 +23,7 @@ export interface VaultSettingsStore extends VaultSettings {
 const initVaultSettings: VaultSettings = {
   enableVim: false,
   preamble: '',
+  newNoteDirectory: '',
 };
 
 export const useVaultSettingsStore = create<VaultSettingsStore>()(

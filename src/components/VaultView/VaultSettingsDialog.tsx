@@ -5,6 +5,7 @@ import { Switch } from '../ui/switch';
 import { useVaultSettingsStore } from '@/stores/vaultSettingsStore';
 import { ChangeEventHandler, useEffect, useState } from 'react';
 import { Textarea } from '../ui/textarea';
+import { Input } from '../ui/input';
 
 export interface VaultSettingsDialogProps {
   vaultDir: string;
@@ -32,6 +33,11 @@ export default function VaultSettingsDialog(props: VaultSettingsDialogProps) {
     vaultSettings.save(vaultDir);
   };
 
+  const saveNewNoteDirectory: ChangeEventHandler<HTMLInputElement> = e => {
+    vaultSettings.updateSettings({ newNoteDirectory: e.target.value });
+    vaultSettings.save(vaultDir);
+  };
+
   const savePreamble: ChangeEventHandler<HTMLTextAreaElement> = e => {
     vaultSettings.updateSettings({ preamble: e.target.value });
     vaultSettings.save(vaultDir);
@@ -44,12 +50,21 @@ export default function VaultSettingsDialog(props: VaultSettingsDialogProps) {
           <DialogTitle>Settings</DialogTitle>
           <DialogDescription></DialogDescription>
         </DialogHeader>
-        {/* <div className="flex flex-col"></div> */}
+        <div className="flex items-center space-x-2">
+          <Label htmlFor="new-note-directory">
+            Default location for new notes (empty for root folder)
+          </Label>
+          <Input
+            id="new-note-directory"
+            value={vaultSettings.newNoteDirectory}
+            onChange={saveNewNoteDirectory}
+          />
+        </div>
         <div className="flex items-center space-x-2">
           <Switch
+            id="enable-vim"
             checked={vaultSettings.enableVim}
             onCheckedChange={toggleVim}
-            id="enable-vim"
           />
           <Label htmlFor="enable-vim">Enable vim keybindings</Label>
         </div>
