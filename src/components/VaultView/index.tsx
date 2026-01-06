@@ -78,14 +78,14 @@ export default function VaultView(props: VaultViewProps) {
   return (
     <main className="h-screen w-screen">
       <ResizablePanelGroup direction="horizontal">
-        <ResizablePanel style={{ overflowY: 'scroll' }} defaultSize={20}>
+        <ResizablePanel style={{ overflowY: 'auto' }} defaultSize={20}>
           <FileExplorerView
             fileTree={vault.fileTree}
             onSelectFile={openFileInEditor}
           />
         </ResizablePanel>
         <ResizableHandle />
-        <ResizablePanel style={{ overflowY: 'scroll' }}>
+        <ResizablePanel style={{ overflowY: 'auto' }}>
           <TypstCanvas
             ref={typstCanvasRef}
             filePath={openFilePath}

@@ -33,6 +33,7 @@ export interface VaultStore extends Vault {
   ): Promise<string>;
   readNote(relativePath: string): Promise<string | undefined>;
   writeNote(relativePath: string, source: string): Promise<void>;
+  searchNotes(query: string): string[];
   fetchPackage(spec: string): Promise<Package>;
 }
 
@@ -111,6 +112,29 @@ export const useVaultStore = createStore<VaultStore>((set, get) => ({
   async writeNote(relativePath: string, source: string) {
     const absPath = await join(get().vaultDir, relativePath);
     await writeTextFile(absPath, source);
+  },
+
+  searchNotes(query: string): string[] {
+    const lowercaseQuery = query.toLowerCase();
+    const findFiles = (
+      tree: VaultTreeNode[],
+      dirPath: string = '',
+      acc: string[] = [],
+    ): string[] => {
+      for (const node of tree) {
+        if (node.isDirectory && node.children) {
+          const innerDirPath =
+            dirPath === '' ? node.name : `${dirPath}/${node.name}`;
+          findFiles(node.children, innerDirPath, acc);
+        } else if (node.name.toLowerCase().includes(lowercaseQuery)) {
+          acc.push(`${dirPath}/${node.name}`);
+        }
+      }
+      return acc;
+    };
+
+    const fileTree = get().fileTree;
+    return findFiles(fileTree);
   },
 
   async fetchPackage(spec: string): Promise<Package> {
