@@ -6,8 +6,8 @@ import {
   AccordionTrigger,
 } from '../ui/accordion';
 import { Button, buttonVariants } from '../ui/button';
-import { VaultTreeNode } from '@/types';
 import { VAULT_DATA_DIR, TYPST_EXTENSION } from '@/globals';
+import { VaultTreeNode } from '@/stores/vaultStore';
 
 type FileExplorerViewProps = {
   fileTree: VaultTreeNode[];
