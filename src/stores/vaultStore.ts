@@ -11,7 +11,7 @@ import {
   readFile,
 } from '@tauri-apps/plugin-fs';
 import { join } from '@tauri-apps/api/path';
-import { TYPST_EXTENSION } from '@/globals';
+import { TYPST_EXTENSION, VAULT_DATA_DIR } from '@/globals';
 import { VAULT_PACKAGES_DIR } from '@/globals';
 import untar from 'js-untar';
 import { decompressSync } from 'fflate';
@@ -37,7 +37,7 @@ export interface VaultStore extends Vault {
   fetchPackage(spec: string): Promise<Package>;
 }
 
-export const useVaultStore = createStore<VaultStore>((set, get) => ({
+export const useVaultStore = createStore<VaultStore>()((set, get) => ({
   _hydrated: false,
   fileTree: [],
   vaultDir: '',
@@ -122,10 +122,13 @@ export const useVaultStore = createStore<VaultStore>((set, get) => ({
       acc: string[] = [],
     ): string[] => {
       for (const node of tree) {
+        if (node.isDirectory && node.name === VAULT_DATA_DIR) continue;
         if (node.isDirectory && node.children) {
           const innerDirPath =
             dirPath === '' ? node.name : `${dirPath}/${node.name}`;
           findFiles(node.children, innerDirPath, acc);
+        } else if (!node.name.endsWith(TYPST_EXTENSION)) {
+          continue;
         } else if (node.name.toLowerCase().includes(lowercaseQuery)) {
           acc.push(`${dirPath}/${node.name}`);
         }

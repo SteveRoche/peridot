@@ -17,7 +17,7 @@ type FileExplorerViewProps = {
 
 const formatFilename = (filename: string) =>
   filename.endsWith(TYPST_EXTENSION)
-    ? filename.slice(0, filename.length - TYPST_EXTENSION.length)
+    ? filename.slice(0, -TYPST_EXTENSION.length)
     : filename;
 
 export default function FileExplorerView({

@@ -10,6 +10,8 @@ import { useEffect, useRef, useState } from 'react';
 import { vim } from '@replit/codemirror-vim';
 import { useVaultSettingsStore } from '@/stores/vaultSettingsStore';
 import { useVaultStore } from '@/stores/vaultStore';
+import { useVaultAppStore } from '@/stores/vaultAppStore';
+import { TYPST_EXTENSION } from '@/globals';
 
 interface VaultViewProps {
   vaultDir: string;
@@ -18,7 +20,10 @@ interface VaultViewProps {
 export default function VaultView(props: VaultViewProps) {
   const { vaultDir } = props;
   const [source, setSource] = useState<string>('');
-  const [openFilePath, setOpenFilePath] = useState<string>('');
+
+  const openFilePath = useVaultAppStore(state => state.openFilePath);
+  const setOpenFilePath = (openFilePath: string) =>
+    useVaultAppStore.setState({ openFilePath });
 
   const typstCanvasRef = useRef<TypstCanvasHandle | null>(null);
   const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -58,8 +63,8 @@ export default function VaultView(props: VaultViewProps) {
   };
 
   const handleLink = async (url: string) => {
-    const noteBasename = `${url.slice('peridot://'.length, url.length)}.typ`;
-    openFileInEditor(
+    const noteBasename = `${url.slice('peridot://'.length, url.length)}${TYPST_EXTENSION}`;
+    setOpenFilePath(
       await vault.findOrCreateNote(
         noteBasename,
         vaultSettings.newNoteDirectory,
@@ -67,13 +72,15 @@ export default function VaultView(props: VaultViewProps) {
     );
   };
 
-  const openFileInEditor = async (relativeFilePath: string) => {
-    const noteSource = await vault.readNote(relativeFilePath);
-    if (noteSource === undefined) return;
-    setSource(noteSource);
-    setOpenFilePath(relativeFilePath);
-    if (typstCanvasRef.current) typstCanvasRef.current.render(noteSource);
-  };
+  useVaultAppStore.subscribe(
+    state => state.openFilePath,
+    async (relativeFilePath: string) => {
+      const noteSource = await vault.readNote(relativeFilePath);
+      if (noteSource === undefined) return;
+      setSource(noteSource);
+      if (typstCanvasRef.current) typstCanvasRef.current.render(noteSource);
+    },
+  );
 
   return (
     <main className="h-screen w-screen">
@@ -81,7 +88,7 @@ export default function VaultView(props: VaultViewProps) {
         <ResizablePanel style={{ overflowY: 'auto' }} defaultSize={20}>
           <FileExplorerView
             fileTree={vault.fileTree}
-            onSelectFile={openFileInEditor}
+            onSelectFile={setOpenFilePath}
           />
         </ResizablePanel>
         <ResizableHandle />
